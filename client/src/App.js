@@ -16,6 +16,10 @@ import AdminRoute from "./components/routes/AdminRoute";
 import Password from "./pages/user/Password";
 import Wishlist from "./pages/user/Wishlist";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import CategoryCreate from "./pages/admin/category/CategoryCreate";
+import CategoryUpdate from "./pages/admin/category/CategoryUpdate";
+import SubCreate from "./pages/admin/sub/SubCreate";
+import SubUpdate from "./pages/admin/sub/SubUpdate";
 
 import { auth } from "./firebase";
 import { useDispatch } from "react-redux";
@@ -62,18 +66,45 @@ const App = () => {
         <Route exact path="/register" element={<Register />} />
         <Route exact path="/register/complete" element={<RegisterComplete />} />
         <Route exact path="/forgot/password" element={<ForgotPassword />} />
-        <Route path="/user/history" element={<UserRoute element={History} />} />
         <Route
+          exact
+          path="/user/history"
+          element={<UserRoute element={History} />}
+        />
+        <Route
+          exact
           path="/user/password"
           element={<UserRoute element={Password} />}
         />
         <Route
+          exact
           path="/user/wishlist"
           element={<UserRoute element={Wishlist} />}
         />
         <Route
+          exact
           path="/admin/dashboard"
           element={<AdminRoute element={AdminDashboard} />}
+        />
+        <Route
+          exact
+          path="/admin/category"
+          element={<AdminRoute element={CategoryCreate} />}
+        />
+        <Route
+          exact
+          path="/admin/category/:slug"
+          element={<AdminRoute element={CategoryUpdate} />}
+        />
+        <Route
+          exact
+          path="/admin/sub"
+          element={<AdminRoute element={SubCreate} />}
+        />
+        <Route
+          exact
+          path="/admin/sub/:slug"
+          element={<AdminRoute element={SubUpdate} />}
         />
       </Routes>
     </>

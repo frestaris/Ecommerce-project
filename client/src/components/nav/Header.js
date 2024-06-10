@@ -70,33 +70,45 @@ const Header = () => {
     },
   ];
 
-  const itemsLoggedIn = [
-    {
-      label: (
-        <Link to="/" style={{ textDecoration: "none" }}>
-          Home
-        </Link>
-      ),
-      key: "home",
-      icon: <HomeOutlined />,
-    },
-    {
-      label: username,
-      key: "SubMenu",
-      icon: <SettingOutlined />,
-      className: "ms-auto",
-      children: [
-        { label: "Option 1", key: "setting:1" },
-        { label: "Option 2", key: "setting:2" },
+  const itemsLoggedIn = user
+    ? [
         {
-          label: "Logout",
-          key: "logout",
-          icon: <LogoutOutlined />,
-          onClick: logout,
+          label: (
+            <Link to="/" style={{ textDecoration: "none" }}>
+              Home
+            </Link>
+          ),
+          key: "home",
+          icon: <HomeOutlined />,
         },
-      ],
-    },
-  ];
+        {
+          label: username,
+          key: "SubMenu",
+          icon: <SettingOutlined />,
+          className: "ms-auto",
+          children: [
+            {
+              label: "Dashboard",
+              onClick: () => redirectToDashboard(user.role),
+            },
+            {
+              label: "Logout",
+              key: "logout",
+              icon: <LogoutOutlined />,
+              onClick: logout,
+            },
+          ],
+        },
+      ]
+    : [];
+
+  const redirectToDashboard = (role) => {
+    if (role === "subscriber") {
+      navigate("/user/history");
+    } else if (role === "admin") {
+      navigate("/admin/dashboard");
+    }
+  };
 
   const items = user ? itemsLoggedIn : itemsLoggedOut;
 
