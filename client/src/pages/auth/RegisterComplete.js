@@ -2,11 +2,16 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAuth, signInWithEmailLink, updatePassword } from "firebase/auth";
 import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { createOrUpdateUser } from "../../functions/auth";
 
 const RegisterComplete = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+
+  const { user } = useSelector((state) => ({ ...state }));
+  let dispatch = useDispatch();
 
   useEffect(() => {
     const emailForRegistration = window.localStorage.getItem(
@@ -49,6 +54,27 @@ const RegisterComplete = () => {
         let user = auth.currentUser;
         await updatePassword(user, password);
         const idTokenResult = await user.getIdTokenResult();
+
+        try {
+          const res = await createOrUpdateUser(idTokenResult.token);
+          console.log("CREATE OR UPDATE RES", res);
+
+          dispatch({
+            type: "LOGGED_IN_USER",
+            payload: {
+              name: res.data.name,
+              email: res.data.email,
+              token: idTokenResult.token,
+              role: res.data.role,
+              _id: res.data._id,
+            },
+          });
+          navigate("/");
+          toast.success("Login successful!");
+        } catch (err) {
+          console.error("Error in createOrUpdateUser:", err);
+          toast.error("Failed to create or update user");
+        }
         // redux store (if applicable)
         console.log("user", user, "idTokenResult", idTokenResult);
         // redirect

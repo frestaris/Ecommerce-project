@@ -6,19 +6,32 @@ import { Button } from "antd";
 import { GoogleOutlined, MailOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
+import { createOrUpdateUser } from "../../functions/auth";
 
 const Login = () => {
   const [email, setEmail] = useState("frestaris@gmail.com");
-  const [password, setPassword] = useState("111111");
+  const [password, setPassword] = useState("123456");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { user } = useSelector((state) => ({ ...state }));
+  const user = useSelector((state) => state.user);
   // redirecting user if logged in
+
   useEffect(() => {
-    if (user && user.token) navigate("/");
+    if (user && user.token) {
+      console.log("User is logged in, redirecting...");
+      navigate(user.role === "admin" ? "/admin/dashboard" : "/user/history");
+    }
   }, [user, navigate]);
 
   let dispatch = useDispatch();
+
+  const roleBasedRedirect = (res) => {
+    if (res.data.role === "admin") {
+      navigate("/admin/dashboard");
+    } else {
+      navigate("/user/history");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,18 +41,30 @@ const Login = () => {
       const { user } = result;
       const idTokenResult = await user.getIdTokenResult();
 
-      dispatch({
-        type: "LOGGED_IN_USER",
-        payload: {
-          email: user.email,
-          token: idTokenResult.token,
-        },
-      });
-      navigate("/");
-      toast.success("Login successful!");
+      try {
+        const res = await createOrUpdateUser(idTokenResult.token);
+        console.log("CREATE OR UPDATE RES", res);
+
+        dispatch({
+          type: "LOGGED_IN_USER",
+          payload: {
+            name: res.data.name,
+            email: res.data.email,
+            token: idTokenResult.token,
+            role: res.data.role,
+            _id: res.data._id,
+          },
+        });
+        roleBasedRedirect(res);
+        toast.success("Login successful!");
+      } catch (err) {
+        console.error("Error in createOrUpdateUser:", err);
+        toast.error("Failed to create or update user");
+      }
     } catch (error) {
-      console.log(error);
+      console.error("Error in signInWithEmailAndPassword:", error);
       toast.error(error.message);
+    } finally {
       setLoading(false);
     }
   };
@@ -50,15 +75,26 @@ const Login = () => {
       const { user } = result;
       const idTokenResult = await user.getIdTokenResult();
 
-      dispatch({
-        type: "LOGGED_IN_USER",
-        payload: {
-          email: user.email,
-          token: idTokenResult.token,
-        },
-      });
-      toast.success("Login successful!");
-      navigate("/");
+      try {
+        const res = await createOrUpdateUser(idTokenResult.token);
+        console.log("CREATE OR UPDATE RES", res);
+
+        dispatch({
+          type: "LOGGED_IN_USER",
+          payload: {
+            name: res.data.name,
+            email: res.data.email,
+            token: idTokenResult.token,
+            role: res.data.role,
+            _id: res.data._id,
+          },
+        });
+        roleBasedRedirect(res);
+        toast.success("Login successful!");
+      } catch (err) {
+        console.error("Error in createOrUpdateUser:", err);
+        toast.error("Failed to create or update user");
+      }
     } catch (error) {
       console.error("Error logging in with Google: ", error);
       toast.error("Google login failed. Please try again.");

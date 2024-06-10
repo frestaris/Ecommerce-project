@@ -11,11 +11,11 @@ dotenv.config();
 const app = express();
 
 //  database
+console.log("Connecting to MongoDB at:", process.env.DATABASE);
 mongoose
   .connect(process.env.DATABASE, {
     useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: true,
+    useUnifiedTopology: true,
   })
   .then(() => console.log("DB CONNECTED"))
   .catch((error) => console.log(`DB CONNECTION ERR ${error}`));
