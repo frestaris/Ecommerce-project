@@ -18,7 +18,6 @@ const Login = () => {
 
   useEffect(() => {
     if (user && user.token) {
-      console.log("User is logged in, redirecting...");
       navigate(user.role === "admin" ? "/admin/dashboard" : "/user/history");
     }
   }, [user, navigate]);
@@ -43,7 +42,6 @@ const Login = () => {
 
       try {
         const res = await createOrUpdateUser(idTokenResult.token);
-        console.log("CREATE OR UPDATE RES", res);
 
         dispatch({
           type: "LOGGED_IN_USER",
