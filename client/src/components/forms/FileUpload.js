@@ -101,7 +101,7 @@ const FileUpload = ({ values, setValues, setLoading }) => {
       </div>
       <div className="row">
         <label
-          className="btn btn-outline-primary "
+          className="btn btn-outline-primary mt-2 "
           style={{ display: "inline-block", width: "auto" }}
         >
           Choose File
