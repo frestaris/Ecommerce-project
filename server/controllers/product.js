@@ -70,3 +70,33 @@ exports.update = async (req, res) => {
     res.status(400).send("Update product failed");
   }
 };
+
+exports.list = async (req, res) => {
+  try {
+    const { sort, order, page } = req.body;
+    const currentPage = page || 1;
+    const perPage = 3;
+
+    const products = await Product.find({})
+      .skip((currentPage - 1) * perPage)
+      .populate("category")
+      .populate("subs")
+      .sort([[sort, order]])
+      .limit(perPage)
+      .exec();
+    res.json(products);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("Fetching products failed!");
+  }
+};
+
+exports.productsCount = async (req, res) => {
+  try {
+    const total = await Product.find({}).estimatedDocumentCount().exec();
+    res.json(total);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("Fetching product count failed!");
+  }
+};
