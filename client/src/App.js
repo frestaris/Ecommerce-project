@@ -125,11 +125,7 @@ const App = () => {
           path="/admin/product/:slug"
           element={<AdminRoute element={ProductUpdate} />}
         />
-        <Route
-          exact
-          path="/product/:slug"
-          element={<AdminRoute element={Product} />}
-        />
+        <Route exact path="/product/:slug" element={<Product />} />
       </Routes>
     </>
   );

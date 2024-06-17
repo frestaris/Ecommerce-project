@@ -5,7 +5,7 @@ import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { Button } from "antd";
 import { GoogleOutlined, MailOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { createOrUpdateUser } from "../../functions/auth";
 
 const Login = () => {
@@ -13,22 +13,33 @@ const Login = () => {
   const [password, setPassword] = useState("123456");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useSelector((state) => state.user);
   // redirecting user if logged in
 
   useEffect(() => {
-    if (user && user.token) {
-      navigate(user.role === "admin" ? "/admin/dashboard" : "/user/history");
+    let intended = location.state?.from;
+    if (intended) {
+      return;
+    } else {
+      if (user && user.token) {
+        navigate(user.role === "admin" ? "/admin/dashboard" : "/user/history");
+      }
     }
-  }, [user, navigate]);
+  }, [user, navigate, location]);
 
   let dispatch = useDispatch();
 
   const roleBasedRedirect = (res) => {
-    if (res.data.role === "admin") {
-      navigate("/admin/dashboard");
+    let intended = location.state?.from;
+    if (intended) {
+      navigate(intended.from);
     } else {
-      navigate("/user/history");
+      if (res.data.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/user/history");
+      }
     }
   };
 

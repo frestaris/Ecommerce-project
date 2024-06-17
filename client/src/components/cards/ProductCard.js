@@ -3,6 +3,7 @@ import { Card } from "antd";
 import { EyeOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import laptop from "../../../src/images/laptop.png";
 import { Link } from "react-router-dom";
+import { showAverage } from "../../functions/rating";
 
 const { Meta } = Card;
 
@@ -11,6 +12,13 @@ const ProductCard = ({ product }) => {
 
   return (
     <div>
+      <div className="mb-2">
+        {product && product.ratings && product.ratings.length > 0 ? (
+          showAverage(product)
+        ) : (
+          <div className="py-2">"No rating yet"</div>
+        )}
+      </div>
       <Card
         className="mb-2"
         style={{ width: "300px" }}

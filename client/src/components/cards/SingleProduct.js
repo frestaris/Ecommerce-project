@@ -6,11 +6,25 @@ import { Carousel } from "react-responsive-carousel";
 import ProductListItems from "./ProductListItems";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import laptop from "../../images/laptop.png";
+import StarRating from "react-star-ratings";
+import RatingModal from "../modal/RatingModal";
+import { showAverage } from "../../functions/rating";
 
-const SingleProduct = ({ product }) => {
-  const { title, images, description } = product;
+const SingleProduct = ({ product, onStarClick, star }) => {
+  const { title, images, description, _id } = product;
 
-  const { TabPane } = Tabs;
+  const tabItems = [
+    {
+      key: "1",
+      label: "Description",
+      children: description && description,
+    },
+    {
+      key: "2",
+      label: "More",
+      children: "Call us on xxx xxx xxx xxx to learn more about this product!",
+    },
+  ];
 
   return (
     <div className="row p-4">
@@ -30,17 +44,16 @@ const SingleProduct = ({ product }) => {
           ></Card>
         )}
 
-        <Tabs type="card">
-          <TabPane tab="Description" key="1">
-            {description && description}
-          </TabPane>
-          <TabPane tab="More" key="2">
-            Call us on xxx xxx xxx xxx to learn more about this product!
-          </TabPane>
-        </Tabs>
+        <Tabs type="card" items={tabItems} />
       </div>
       <div className="col-md-5">
         <h2 className="bg-dark text-white rounded p-3">{title}</h2>
+        {product && product.ratings && product.ratings.length > 0 ? (
+          showAverage(product)
+        ) : (
+          <div className="text-center py-2">"No rating yet"</div>
+        )}
+        <div className="text-center m-2"></div>
         <Card
           actions={[
             <>
@@ -49,6 +62,18 @@ const SingleProduct = ({ product }) => {
             <Link to={`/`}>
               <HeartOutlined className="text-info" /> <br /> Add to Wishlist
             </Link>,
+            <RatingModal>
+              <StarRating
+                name={_id}
+                numberOfStars={5}
+                rating={star}
+                changeRating={onStarClick}
+                isSelectable={true}
+                starRatedColor="gold"
+                starHoverColor="gold"
+                starDimension="40px"
+              />
+            </RatingModal>,
           ]}
         >
           <ProductListItems product={product} />
