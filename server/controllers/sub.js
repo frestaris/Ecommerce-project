@@ -1,5 +1,6 @@
 const Sub = require("../models/sub");
 const slugify = require("slugify");
+const Product = require("../models/product");
 
 exports.create = async (req, res) => {
   try {
@@ -22,15 +23,15 @@ exports.list = async (req, res) => {
 };
 
 exports.read = async (req, res) => {
-  try {
-    const subCategory = await Sub.findOne({ slug: req.params.slug });
-    if (!subCategory) {
-      return res.status(404).send("Sub-category not found");
-    }
-    res.json(subCategory);
-  } catch (err) {
-    res.status(400).send("Read sub-category failed");
-  }
+  let sub = await Sub.findOne({ slug: req.params.slug }).exec();
+  const products = await Product.find({ subs: sub })
+    .populate("category")
+    .exec();
+
+  res.json({
+    sub,
+    products,
+  });
 };
 
 exports.update = async (req, res) => {

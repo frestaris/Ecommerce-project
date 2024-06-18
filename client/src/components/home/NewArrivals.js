@@ -31,7 +31,7 @@ const NewArrivals = () => {
     <>
       <div className="container">
         {loading ? (
-          <LoadingCard count={3} />
+          <LoadingCard count={4} />
         ) : (
           <div className="row">
             {products.map((product) => (
