@@ -8,11 +8,13 @@ import {
   UserOutlined,
   UserAddOutlined,
   LogoutOutlined,
+  ShoppingOutlined,
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { getAuth, signOut } from "firebase/auth";
 import { useSelector, useDispatch } from "react-redux";
+import Search from "../forms/Search";
 
 const Header = () => {
   const [current, setCurrent] = useState("home");
@@ -51,13 +53,26 @@ const Header = () => {
     },
     {
       label: (
+        <Link to="/shop" style={{ textDecoration: "none" }}>
+          Shop
+        </Link>
+      ),
+      key: "shop",
+      icon: <ShoppingOutlined />,
+    },
+    {
+      label: <Search />,
+      key: "search",
+      className: "ms-auto ",
+    },
+    {
+      label: (
         <Link to="/login" style={{ textDecoration: "none" }}>
           Login
         </Link>
       ),
       key: "login",
       icon: <UserOutlined />,
-      className: "ms-auto",
     },
     {
       label: (
@@ -82,10 +97,24 @@ const Header = () => {
           icon: <HomeOutlined />,
         },
         {
+          label: (
+            <Link to="/shop" style={{ textDecoration: "none" }}>
+              Shop
+            </Link>
+          ),
+          key: "shop",
+          icon: <ShoppingOutlined />,
+        },
+        {
+          label: <Search />,
+          key: "search",
+          className: "ms-auto",
+        },
+        {
           label: username,
           key: "SubMenu",
           icon: <SettingOutlined />,
-          className: "ms-auto",
+          className: "",
           children: [
             {
               label: "Dashboard",
