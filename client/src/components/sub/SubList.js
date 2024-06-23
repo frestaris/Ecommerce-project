@@ -32,7 +32,7 @@ const SubList = () => {
         {loading ? (
           <h4 className="text-center">Loading...</h4>
         ) : (
-          <div className="d-flex flex-wrap ">{showSubs()}</div>
+          <div className="d-flex flex-wrap">{showSubs()}</div>
         )}
       </div>
     </div>

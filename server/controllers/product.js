@@ -165,11 +165,136 @@ const handleQuery = async (req, res, query) => {
   res.json(products);
 };
 
-exports.searchFilters = async (req, res) => {
-  const { query } = req.body;
+const handlePrice = async (req, res, price) => {
+  try {
+    const products = await Product.find({
+      price: {
+        $gte: price[0],
+        $lte: price[1],
+      },
+    })
+      .populate("category", "_id name")
+      .populate("subs", "_id name")
+      .exec();
 
-  if (query) {
-    console.log("query", query);
-    await handleQuery(req, res, query);
+    res.json(products);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+const handleCategory = async (req, res, category) => {
+  try {
+    const products = await Product.find({ category })
+      .populate("category", "_id name")
+      .populate("subs", "_id name")
+      .exec();
+    res.json(products);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const handleStar = async (req, res, stars) => {
+  try {
+    const aggregates = await Product.aggregate([
+      {
+        $project: {
+          document: "$$ROOT",
+          floorAverage: {
+            $floor: { $avg: "$ratings.star" },
+          },
+        },
+      },
+      { $match: { floorAverage: stars } },
+    ]).limit(12);
+
+    const productIds = aggregates.map((agg) => agg._id);
+    const products = await Product.find({ _id: { $in: productIds } })
+      .populate("category", "_id name")
+      .populate("subs", "_id name")
+      .exec();
+
+    res.json(products);
+  } catch (err) {
+    console.error("Error fetching products:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const handleShipping = async (req, res, shipping) => {
+  try {
+    const products = await Product.find({ shipping })
+      .populate("category", "_id name")
+      .populate("subs", "_id name")
+      .exec();
+    res.json(products);
+  } catch (err) {
+    console.error(err);
+  }
+};
+const handleColor = async (req, res, color) => {
+  try {
+    const products = await Product.find({ color })
+      .populate("category", "_id name")
+      .populate("subs", "_id name")
+      .exec();
+    res.json(products);
+  } catch (err) {
+    console.error(err);
+  }
+};
+const handleBrand = async (req, res, brand) => {
+  try {
+    const products = await Product.find({ brand })
+      .populate("category", "_id name")
+      .populate("subs", "_id name")
+      .exec();
+    res.json(products);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+exports.searchFilters = async (req, res) => {
+  const { query, price, category, stars, shipping, color, brand } = req.body;
+
+  try {
+    if (query) {
+      console.log("query", query);
+      await handleQuery(req, res, query);
+    }
+
+    if (price !== undefined) {
+      console.log("price", price);
+      await handlePrice(req, res, price);
+    }
+
+    if (category) {
+      console.log("category --->", category);
+      await handleCategory(req, res, category);
+    }
+
+    if (stars !== undefined) {
+      console.log("stars --->", stars);
+      await handleStar(req, res, stars);
+    }
+
+    if (shipping) {
+      console.log("shipping --->", shipping);
+      await handleShipping(req, res, shipping);
+    }
+    if (color) {
+      console.log("color --->", color);
+      await handleColor(req, res, color);
+    }
+    if (brand) {
+      console.log("brand --->", brand);
+      await handleBrand(req, res, brand);
+    }
+  } catch (err) {
+    console.error("Error handling filters:", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
