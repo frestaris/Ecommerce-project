@@ -15,7 +15,14 @@ const ProductListItems = ({ product }) => {
         {category && (
           <li className="my-2 d-flex justify-content-between align-items-center">
             Category
-            <Link to={`/category/${category.slug}`}>{category.name}</Link>
+            <Link
+              to={`/category/${category.slug}`}
+              style={{
+                textDecoration: "none",
+              }}
+            >
+              {category.name}
+            </Link>
           </li>
         )}
 
@@ -25,7 +32,12 @@ const ProductListItems = ({ product }) => {
             <div>
               {subs.map((s, index) => (
                 <React.Fragment key={s._id}>
-                  <Link to={`/sub/${s.slug}`} className="mr-1">
+                  <Link
+                    to={`/sub/${s.slug}`}
+                    style={{
+                      textDecoration: "none",
+                    }}
+                  >
                     {s.name}
                   </Link>
                   {index !== subs.length - 1 && " "}

@@ -4,6 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
+import SideDrawer from "./components/drawer/SideDrawer";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Home from "./pages/Home";
@@ -27,6 +28,7 @@ import Product from "./pages/Product";
 import CategoryHome from "./pages/category/CategoryHome";
 import SubHome from "./pages/sub/SubHome";
 import Shop from "./pages/Shop";
+import Cart from "./pages/Cart";
 
 import { auth } from "./firebase";
 import { useDispatch } from "react-redux";
@@ -66,6 +68,7 @@ const App = () => {
   return (
     <>
       <Header />
+      <SideDrawer />
       <ToastContainer />
       <Routes>
         <Route exact path="/" element={<Home />} />
@@ -132,6 +135,7 @@ const App = () => {
         <Route exact path="/category/:slug" element={<CategoryHome />} />
         <Route exact path="/sub/:slug" element={<SubHome />} />
         <Route exact path="/shop" element={<Shop />} />
+        <Route exact path="/cart" element={<Cart />} />
       </Routes>
     </>
   );

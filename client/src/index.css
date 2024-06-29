@@ -13,3 +13,6 @@
   align-items: center;
   gap: 5px;
 }
+.pointer {
+  cursor: pointer;
+}

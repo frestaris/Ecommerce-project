@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Menu } from "antd";
+import { Menu, Badge } from "antd";
 import { toast } from "react-toastify";
 
 import {
@@ -9,6 +9,7 @@ import {
   UserAddOutlined,
   LogoutOutlined,
   ShoppingOutlined,
+  ShoppingCartOutlined,
 } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -18,7 +19,10 @@ import Search from "../forms/Search";
 
 const Header = () => {
   const [current, setCurrent] = useState("home");
-  const user = useSelector((state) => state.user);
+  const { user, cart } = useSelector((state) => ({
+    user: state.user || null,
+    cart: state.cart || [],
+  }));
   const onClick = (e) => {
     setCurrent(e.key);
   };
@@ -59,6 +63,17 @@ const Header = () => {
       ),
       key: "shop",
       icon: <ShoppingOutlined />,
+    },
+    {
+      label: (
+        <Link to="/cart" style={{ textDecoration: "none" }}>
+          <Badge count={cart.length} offset={[9, 0]}>
+            Cart
+          </Badge>
+        </Link>
+      ),
+      key: "cart",
+      icon: <ShoppingCartOutlined />,
     },
     {
       label: <Search />,
@@ -104,6 +119,17 @@ const Header = () => {
           ),
           key: "shop",
           icon: <ShoppingOutlined />,
+        },
+        {
+          label: (
+            <Link to="/cart" style={{ textDecoration: "none" }}>
+              <Badge count={cart.length} offset={[9, 0]}>
+                Cart
+              </Badge>
+            </Link>
+          ),
+          key: "cart",
+          icon: <ShoppingCartOutlined />,
         },
         {
           label: <Search />,
