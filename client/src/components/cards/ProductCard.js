@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { showAverage } from "../../functions/rating";
 import _ from "lodash";
 import { useSelector, useDispatch } from "react-redux";
+import { selectUserAndCart } from "../../reducers/selectors";
 
 const { Meta } = Card;
 
@@ -14,10 +15,7 @@ const ProductCard = ({ product }) => {
   const [tooltip, setToolTip] = useState("Click to add");
 
   // redux
-  const { user, cart } = useSelector((state) => ({
-    user: state.user,
-    cart: state.cart,
-  }));
+  const { user, cart } = useSelector(selectUserAndCart);
   const dispatch = useDispatch();
 
   const handleAddToCart = () => {

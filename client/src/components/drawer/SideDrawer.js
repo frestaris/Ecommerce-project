@@ -3,12 +3,10 @@ import { useSelector, useDispatch } from "react-redux";
 import { Drawer } from "antd";
 import { Link } from "react-router-dom";
 import laptop from "../../images/laptop.png";
+import { selectDrawerAndCart } from "../../reducers/selectors";
 
 const SideDrawer = () => {
-  const { drawer, cart } = useSelector((state) => ({
-    drawer: state.drawer,
-    cart: state.cart,
-  }));
+  const { drawer, cart } = useSelector(selectDrawerAndCart);
   const dispatch = useDispatch();
 
   const imageStyle = {

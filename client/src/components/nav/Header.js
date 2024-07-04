@@ -16,13 +16,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { getAuth, signOut } from "firebase/auth";
 import { useSelector, useDispatch } from "react-redux";
 import Search from "../forms/Search";
+import { selectUserAndCart } from "../../reducers/selectors";
 
 const Header = () => {
   const [current, setCurrent] = useState("home");
-  const { user, cart } = useSelector((state) => ({
-    user: state.user || null,
-    cart: state.cart || [],
-  }));
+  const { user, cart } = useSelector(selectUserAndCart);
   const onClick = (e) => {
     setCurrent(e.key);
   };

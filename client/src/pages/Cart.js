@@ -3,13 +3,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import ProductCardInCheckout from "../components/cards/ProductCardInCheckout";
 import { toast } from "react-toastify";
+import { selectUserAndCart } from "../reducers/selectors";
+import { useNavigate } from "react-router-dom";
+import { userCart } from "../functions/user";
 
 const Cart = () => {
-  const { user, cart } = useSelector((state) => ({
-    user: state.user,
-    cart: state.cart,
-  }));
+  const { user, cart } = useSelector(selectUserAndCart);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // Function to calculate total dynamically
   const getTotal = () => {
@@ -18,7 +19,14 @@ const Cart = () => {
     }, 0);
   };
 
-  const saveOrderToDb = () => {};
+  const saveOrderToDb = () => {
+    userCart(cart, user.token)
+      .then((res) => {
+        console.log("CART POST RES", res);
+        if (res.data.ok) navigate("/checkout");
+      })
+      .catch((err) => console.log("cart save err", err));
+  };
 
   // Function to handle quantity change
   const handleQuantityChange = (productId, quantity) => {
@@ -56,7 +64,7 @@ const Cart = () => {
             </p>
           ) : (
             <table className="table table-bordered">
-              <thead className="thead-light">
+              <thead className="thead-dark">
                 <tr>
                   <th scope="col">Image</th>
                   <th scope="col">Title</th>
