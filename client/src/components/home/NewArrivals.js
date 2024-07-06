@@ -18,13 +18,16 @@ const NewArrivals = () => {
     getProductsCount().then((res) => setProductsCount(res.data));
   }, []);
 
-  const loadAllProducts = () => {
+  const loadAllProducts = async () => {
     setLoading(true);
-    // sort, order, limit
-    getProducts("createdAt", "desc", page).then((res) => {
+    try {
+      const res = await getProducts("createdAt", "desc", page);
       setProducts(res.data);
+    } catch (error) {
+      console.error("Error loading products:", error);
+    } finally {
       setLoading(false);
-    });
+    }
   };
 
   return (

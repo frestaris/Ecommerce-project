@@ -18,19 +18,23 @@ const BestSellers = () => {
     getProductsCount().then((res) => setProductsCount(res.data));
   }, []);
 
-  const loadAllProducts = () => {
+  const loadAllProducts = async () => {
     setLoading(true);
-    getProducts("sold", "desc", page).then((res) => {
+    try {
+      const res = await getProducts("sold", "desc", page);
       setProducts(res.data);
+    } catch (error) {
+      console.error("Error loading products:", error);
+    } finally {
       setLoading(false);
-    });
+    }
   };
 
   return (
     <>
       <div className="container">
         {loading ? (
-          <LoadingCard count={3} />
+          <LoadingCard count={4} />
         ) : (
           <div className="row">
             {products.map((product) => (
@@ -45,7 +49,7 @@ const BestSellers = () => {
           <nav className="col-md-4 offset-md-4 text-center pt-5 p-3">
             <Pagination
               current={page}
-              total={productsCount * 1}
+              total={productsCount * 1.5}
               onChange={(value) => setPage(value)}
             />
           </nav>

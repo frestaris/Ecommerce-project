@@ -267,6 +267,7 @@ const Shop = () => {
         key: `4-${index}`,
         label: (
           <Radio
+            key={b}
             className="pb-2 pl-4 pr-4"
             value={b}
             onChange={handleBrand}
@@ -288,6 +289,7 @@ const Shop = () => {
         key: `5-${index}`,
         label: (
           <Radio
+            key={c}
             className="pb-2 pl-4 pr-4"
             value={c}
             onChange={handleColor}

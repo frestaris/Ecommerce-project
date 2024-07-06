@@ -8,8 +8,6 @@ import {
 } from "../functions/user";
 import { toast } from "react-toastify";
 import { selectUserAndCoupon } from "../reducers/selectors";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
 import { useNavigate } from "react-router-dom";
 
 const Checkout = () => {
@@ -18,6 +16,7 @@ const Checkout = () => {
   const [address, setAddress] = useState("");
   const [addressSaved, setAddressSaved] = useState(false);
   const [coupon, setCoupon] = useState("");
+  // discount price
   const [totalAfterDiscount, setTotalAfterDiscount] = useState(0);
   const [discountError, setDiscountError] = useState("");
 
@@ -27,17 +26,11 @@ const Checkout = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (user && user.token) {
-      getUserCart(user.token)
-        .then((res) => {
-          setProducts(res.data.products);
-          setTotal(res.data.cartTotal);
-        })
-        .catch((error) => {
-          console.error("Error loading user cart", error);
-          toast.error("Failed to load cart");
-        });
-    }
+    getUserCart(user.token).then((res) => {
+      console.log("user cart res", JSON.stringify(res.data, null, 4));
+      setProducts(res.data.products);
+      setTotal(res.data.cartTotal);
+    });
   }, [user]);
 
   const saveAddressToDb = () => {
@@ -51,9 +44,18 @@ const Checkout = () => {
 
   const showAddress = () => (
     <div>
-      <ReactQuill theme="snow" value={address} onChange={setAddress} />
-      <button className="btn btn-secondary mt-2" onClick={saveAddressToDb}>
-        Save
+      <input
+        type="text"
+        value={address}
+        onChange={(e) => setAddress(e.target.value)}
+        className="form-control"
+        placeholder="Enter your Address..."
+      />{" "}
+      <button
+        className="btn btn-outline-success mt-2"
+        onClick={saveAddressToDb}
+      >
+        Save Address
       </button>
     </div>
   );
@@ -75,6 +77,7 @@ const Checkout = () => {
         console.log("RES ON COUPON APPLIED", res.data);
         if (res.data) {
           setTotalAfterDiscount(res.data.totalAfterDiscount); // Ensure this matches the server response structure
+          console.log("Total After Discount:", res.data.totalAfterDiscount);
           setDiscountError(""); // Clear any previous errors
           dispatch({
             type: "COUPON_APPLIED",
@@ -110,10 +113,11 @@ const Checkout = () => {
           value={coupon}
           type="text"
           className="form-control"
+          placeholder="Enter your Coupon..."
         />
         <button
           onClick={applyDiscountCoupon}
-          className="btn btn-secondary mt-2"
+          className="btn btn-outline-success mt-2"
         >
           Apply Coupon
         </button>
@@ -153,7 +157,6 @@ const Checkout = () => {
       <div className="row">
         <div className="col-md-6 mt-3">
           <h4>Delivery Address</h4>
-          <br />
           <br />
 
           {showAddress()}

@@ -7,6 +7,7 @@ import { selectUserAndCoupon } from "../reducers/selectors";
 import { Card } from "antd";
 import { DollarOutlined, CheckOutlined } from "@ant-design/icons";
 import laptop from "../images/laptop.png";
+import { createOrder, emptyUserCart } from "../functions/user";
 
 const StripeCheckout = () => {
   const [succeeded, setSucceeded] = useState(false);
@@ -34,9 +35,7 @@ const StripeCheckout = () => {
           console.log("create payment intent", res.data);
           setClientSecret(res.data.clientSecret);
           setCartTotal(res.data.cartTotal);
-          setTotalAfterDiscount(
-            res.data.totalAfterDiscount || res.data.cartTotal
-          );
+          setTotalAfterDiscount(res.data.totalAfterDiscount);
           setPayable(res.data.payable);
         })
         .catch((err) => {
@@ -49,6 +48,7 @@ const StripeCheckout = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setProcessing(true);
+
     try {
       const payload = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
@@ -60,13 +60,43 @@ const StripeCheckout = () => {
       });
 
       if (payload.error) {
-        setError(`Payment failed ${payload.error.message}`);
+        setError(`Payment failed: ${payload.error.message}`);
         setProcessing(false);
       } else {
-        console.log(JSON.stringify(payload, null, 4));
-        setError(null);
-        setProcessing(false);
-        setSucceeded(true);
+        // Payment succeeded, proceed with order creation
+        try {
+          const orderResponse = await createOrder(payload, user.token);
+          if (orderResponse.data.ok) {
+            // Clear cart from local storage
+            if (typeof window !== "undefined") localStorage.removeItem("cart");
+
+            // Clear cart from Redux
+            dispatch({
+              type: "ADD_TO_CART",
+              payload: [],
+            });
+
+            // Reset coupon
+            dispatch({
+              type: "COUPON_APPLIED",
+              payload: false,
+            });
+
+            // Clear cart from database
+            emptyUserCart(user.token);
+
+            console.log(JSON.stringify(payload, null, 4));
+            setError(null);
+            setProcessing(false);
+            setSucceeded(true);
+          } else {
+            setError("Order creation failed");
+            setProcessing(false);
+          }
+        } catch (orderError) {
+          setError(`Order creation failed: ${orderError.message}`);
+          setProcessing(false);
+        }
       }
     } catch (error) {
       console.error("Error confirming payment:", error);
@@ -107,7 +137,9 @@ const StripeCheckout = () => {
       {!succeeded && (
         <div>
           {coupon ? (
-            <p className="alert alert-success">{`Total after discount: $${totalAfterDiscount}`}</p>
+            <p className="alert alert-success">
+              Total after discount: <b>${totalAfterDiscount}</b>
+            </p>
           ) : (
             <p className="alert alert-danger">No coupon applied</p>
           )}
@@ -131,8 +163,8 @@ const StripeCheckout = () => {
               {cartTotal}
             </>,
             <>
-              <CheckOutlined className="text-info" /> <br /> Total payable : $
-              {(payable / 100).toFixed(2)}
+              <CheckOutlined className="text-info" /> <br /> Total payable :
+              <b> ${(payable / 100).toFixed(2)}</b>
             </>,
           ]}
         />

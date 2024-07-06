@@ -2,6 +2,7 @@ const User = require("../models/user");
 const Product = require("../models/product");
 const Cart = require("../models/cart");
 const Coupon = require("../models/coupon");
+const Order = require("../models/order");
 
 exports.userCart = async (req, res) => {
   const { cart } = req.body;
@@ -141,7 +142,7 @@ exports.applyCouponToUserCart = async (req, res) => {
     // Update cart with discounted total
     await Cart.findOneAndUpdate(
       { orderedBy: user._id },
-      { cartTotal: totalAfterDiscount },
+      { totalAfterDiscount },
       { new: true }
     ).exec();
 
@@ -149,5 +150,54 @@ exports.applyCouponToUserCart = async (req, res) => {
   } catch (error) {
     console.error("Error finding Coupon:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+exports.createOrder = async (req, res) => {
+  try {
+    const { paymentIntent } = req.body.stripeResponse;
+    if (!paymentIntent) {
+      return res.status(400).json({ error: "Payment intent is required" });
+    }
+
+    // Find the user
+    const user = await User.findOne({ email: req.user.email }).exec();
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Find the user's cart
+    const cart = await Cart.findOne({ orderedBy: user._id }).exec();
+    if (!cart) {
+      return res.status(404).json({ error: "Cart not found" });
+    }
+
+    const { products } = cart;
+
+    // Create a new order
+    const newOrder = await new Order({
+      products,
+      paymentIntent,
+      orderedBy: user._id,
+    }).save();
+
+    // Update product quantities and sales
+    let bulkOption = products.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product._id },
+        update: { $inc: { quantity: -item.count, sold: +item.count } },
+      },
+    }));
+
+    let updated = await Product.bulkWrite(bulkOption, {});
+    console.log("PRODUCT QUANTITY DECREMENTED AND SOLD", updated);
+
+    console.log("NEW ORDER SAVED", newOrder);
+
+    // Respond with success message and order details
+    res.json({ ok: true, order: newOrder });
+  } catch (error) {
+    console.error("Error creating order:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

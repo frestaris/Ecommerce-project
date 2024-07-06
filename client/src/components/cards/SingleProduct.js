@@ -13,7 +13,7 @@ import _ from "lodash";
 import { useSelector, useDispatch } from "react-redux";
 
 const SingleProduct = ({ product, onStarClick, star }) => {
-  const { title, images, description, _id } = product;
+  const { title, images, description, _id, quantity } = product;
 
   const [tooltip, setToolTip] = useState("Click to add");
 
@@ -99,12 +99,23 @@ const SingleProduct = ({ product, onStarClick, star }) => {
         <div className="text-center m-2"></div>
         <Card
           actions={[
-            <Tooltip title={tooltip}>
-              <a onClick={handleAddToCart}>
-                <ShoppingCartOutlined className="text-success" />
-                <br />
-                Add to Cart
-              </a>
+            <Tooltip title={product.quantity < 1 ? "Out of stock" : tooltip}>
+              <span>
+                <a
+                  onClick={product.quantity > 0 ? handleAddToCart : undefined}
+                  style={{
+                    cursor: product.quantity > 0 ? "pointer" : "not-allowed",
+                    pointerEvents: product.quantity > 0 ? "auto" : "none",
+                    color: product.quantity > 0 ? "" : "gray",
+                    textDecoration:
+                      product.quantity > 0 ? "none" : "line-through",
+                  }}
+                >
+                  <ShoppingCartOutlined className="text-success" />
+                  <br />
+                  {quantity < 1 ? "Out of stock" : "Add to Cart"}
+                </a>
+              </span>
             </Tooltip>,
             <Link to={`/`}>
               <HeartOutlined className="text-info" /> <br /> Add to Wishlist
