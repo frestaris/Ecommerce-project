@@ -32,7 +32,7 @@ exports.createPaymentIntent = async (req, res) => {
     // Create payment intent with order amount and currency
     const paymentIntent = await stripe.paymentIntents.create({
       amount: finalAmount,
-      currency: "usd",
+      currency: "aud",
     });
 
     res.send({

@@ -1,10 +1,9 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ProductCardInCheckout from "../components/cards/ProductCardInCheckout";
 import { toast } from "react-toastify";
 import { selectUserAndCart } from "../reducers/selectors";
-import { useNavigate } from "react-router-dom";
 import { userCart } from "../functions/user";
 
 const Cart = () => {

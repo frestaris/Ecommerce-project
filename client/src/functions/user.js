@@ -87,3 +87,16 @@ export const createOrder = async (stripeResponse, authtoken) =>
       },
     }
   );
+
+export const getUserOrders = async (authtoken) => {
+  try {
+    return await axios.get(`${process.env.REACT_APP_API}/user/orders`, {
+      headers: {
+        authtoken,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching user orders", error);
+    throw error;
+  }
+};
