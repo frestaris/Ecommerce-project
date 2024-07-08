@@ -1,6 +1,6 @@
 import React from "react";
 
-const ShowPaymentInfo = ({ order }) => {
+const ShowPaymentInfo = ({ order, showStatus = true }) => {
   const formattedAmount = (order.paymentIntent.amount /= 100).toLocaleString(
     "en-AU",
     {
@@ -39,7 +39,9 @@ const ShowPaymentInfo = ({ order }) => {
         Order Date:{" "}
         <b>{new Date(order.paymentIntent.created * 1000).toLocaleString()}</b>
       </p>
-      <p style={orderStatusStyle}>Order Status: {order.orderStatus}</p>
+      {showStatus && (
+        <p style={orderStatusStyle}>Order Status: {order.orderStatus}</p>
+      )}
     </div>
   );
 };

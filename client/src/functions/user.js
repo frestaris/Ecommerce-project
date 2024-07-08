@@ -100,3 +100,50 @@ export const getUserOrders = async (authtoken) => {
     throw error;
   }
 };
+
+export const getWishlist = async (authtoken) => {
+  try {
+    return await axios.get(`${process.env.REACT_APP_API}/user/wishlist`, {
+      headers: {
+        authtoken,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching user wishlist", error);
+    throw error;
+  }
+};
+
+export const removeWishlist = async (productId, authtoken) => {
+  try {
+    return await axios.put(
+      `${process.env.REACT_APP_API}/user/wishlist/${productId}`,
+      {},
+      {
+        headers: {
+          authtoken,
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Error removing item from wishlist", error);
+    throw error;
+  }
+};
+
+export const addToWishlist = async (productId, authtoken) => {
+  try {
+    return await axios.post(
+      `${process.env.REACT_APP_API}/user/wishlist`,
+      { productId },
+      {
+        headers: {
+          authtoken,
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Error adding item to wishlist", error);
+    throw error;
+  }
+};

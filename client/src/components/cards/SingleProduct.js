@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Card, Tabs, Tooltip } from "antd";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { HeartOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { Carousel } from "react-responsive-carousel";
 import ProductListItems from "./ProductListItems";
@@ -11,6 +11,8 @@ import RatingModal from "../modal/RatingModal";
 import { showAverage } from "../../functions/rating";
 import _ from "lodash";
 import { useSelector, useDispatch } from "react-redux";
+import { addToWishlist } from "../../functions/user";
+import { toast } from "react-toastify";
 
 const SingleProduct = ({ product, onStarClick, star }) => {
   const { title, images, description, _id, quantity } = product;
@@ -23,6 +25,7 @@ const SingleProduct = ({ product, onStarClick, star }) => {
     cart: state.cart,
   }));
 
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const handleAddToCart = () => {
@@ -54,6 +57,14 @@ const SingleProduct = ({ product, onStarClick, star }) => {
         payload: true,
       });
     }
+  };
+
+  const handleAddToWishlist = (e) => {
+    e.preventDefault();
+    addToWishlist(product._id, user.token).then((res) => {
+      toast.success("Added to wishlist");
+      navigate("/user/wishlist");
+    });
   };
 
   const tabItems = [
@@ -117,9 +128,9 @@ const SingleProduct = ({ product, onStarClick, star }) => {
                 </a>
               </span>
             </Tooltip>,
-            <Link to={`/`}>
+            <a onClick={handleAddToWishlist}>
               <HeartOutlined className="text-info" /> <br /> Add to Wishlist
-            </Link>,
+            </a>,
             <RatingModal>
               <StarRating
                 name={_id}

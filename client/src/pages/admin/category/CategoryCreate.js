@@ -89,19 +89,24 @@ const CategoryCreate = () => {
           <LocalSearch keyword={keyword} setKeyword={setKeyword} />
           <hr />
           {categories.filter(searched(keyword)).map((c) => (
-            <div className="alert alert-primary" key={c._id}>
+            <div
+              className="alert alert-primary d-flex align-items-center justify-content-between"
+              key={c._id}
+            >
               {c.name}
-              <span
-                onClick={() => handleRemove(c.slug)}
-                className="btn btn-sm text-danger float-end"
-              >
-                <DeleteOutlined />
-              </span>
-              <Link to={`/admin/category/${c.slug}`}>
-                <span className="btn btn-sm text-warning float-end">
-                  <EditOutlined />
+              <div>
+                <span
+                  onClick={() => handleRemove(c.slug)}
+                  className="btn btn-sm text-danger"
+                >
+                  <DeleteOutlined />
                 </span>
-              </Link>
+                <Link to={`/admin/category/${c.slug}`}>
+                  <span className="btn btn-sm text-warning ms-1">
+                    <EditOutlined />
+                  </span>
+                </Link>
+              </div>
             </div>
           ))}
         </div>
