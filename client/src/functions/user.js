@@ -147,3 +147,20 @@ export const addToWishlist = async (productId, authtoken) => {
     throw error;
   }
 };
+
+export const createCashOrderForUser = async (authtoken, COD, coupon) => {
+  try {
+    return await axios.post(
+      `${process.env.REACT_APP_API}/user/cash-order`,
+      { couponApplied: coupon, COD },
+      {
+        headers: {
+          authtoken,
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Error", error);
+    throw error;
+  }
+};

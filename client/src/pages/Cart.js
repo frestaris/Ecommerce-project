@@ -26,6 +26,18 @@ const Cart = () => {
       })
       .catch((err) => console.log("cart save err", err));
   };
+  const saveCashOrderToDb = () => {
+    dispatch({
+      type: "COD",
+      payload: true,
+    });
+    userCart(cart, user.token)
+      .then((res) => {
+        console.log("CART POST RES", res);
+        if (res.data.ok) navigate("/checkout");
+      })
+      .catch((err) => console.log("cart save err", err));
+  };
 
   // Function to handle quantity change
   const handleQuantityChange = (productId, quantity) => {
@@ -102,13 +114,23 @@ const Cart = () => {
           Total: <b>${getTotal()}</b>
           <hr />
           {user ? (
-            <button
-              onClick={saveOrderToDb}
-              className="btn btn-sm btn-success mt-2"
-              disabled={!cart.length}
-            >
-              Proceed to Checkout
-            </button>
+            <div>
+              <button
+                onClick={saveOrderToDb}
+                className="btn btn-sm btn-success mt-2"
+                disabled={!cart.length}
+              >
+                Proceed to Checkout
+              </button>
+              <br />
+              <button
+                onClick={saveCashOrderToDb}
+                className="btn btn-sm btn-warning mt-2"
+                disabled={!cart.length}
+              >
+                Pay Cash on Delivery
+              </button>
+            </div>
           ) : (
             <button className="btn btn-sm btn-success mt-2">
               <Link

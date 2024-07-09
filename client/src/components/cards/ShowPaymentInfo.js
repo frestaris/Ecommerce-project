@@ -10,12 +10,24 @@ const ShowPaymentInfo = ({ order, showStatus = true }) => {
   );
 
   const orderStatusStyle = {
-    backgroundColor:
-      order.orderStatus.toLowerCase() === "processed" ? "green" : "red",
+    backgroundColor: getOrderStatusColor(order.orderStatus.toLowerCase()),
     color: "white",
     padding: "5px",
     borderRadius: "5px",
   };
+
+  function getOrderStatusColor(status) {
+    switch (status) {
+      case "processed":
+        return "blue";
+      case "completed":
+        return "green"; // Assuming "blue" for completed status
+      case "cancelled":
+        return "red";
+      default:
+        return "black"; // Default color if status doesn't match above
+    }
+  }
 
   return (
     <div>

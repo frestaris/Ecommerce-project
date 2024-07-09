@@ -5,9 +5,10 @@ import {
   emptyUserCart,
   saveUserAddress,
   applyCoupon,
+  createCashOrderForUser,
 } from "../functions/user";
 import { toast } from "react-toastify";
-import { selectUserAndCoupon } from "../reducers/selectors";
+import { selectUserAndCOD } from "../reducers/selectors";
 import { useNavigate } from "react-router-dom";
 
 const Checkout = () => {
@@ -20,7 +21,7 @@ const Checkout = () => {
   const [totalAfterDiscount, setTotalAfterDiscount] = useState(0);
   const [discountError, setDiscountError] = useState("");
 
-  const { user } = useSelector(selectUserAndCoupon); // Destructure the selected state
+  const { user, COD } = useSelector(selectUserAndCOD); // Destructure the selected state
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -152,6 +153,31 @@ const Checkout = () => {
     return <div>Loading...</div>;
   }
 
+  const createCashOrder = () => {
+    createCashOrderForUser(user.token, COD, coupon).then((res) => {
+      console.log("USER CASH ORDER CREATED RES", res);
+      if (res.data.ok) {
+        if (typeof window !== "undefined") localStorage.removeItem("cart");
+        dispatch({
+          type: "ADD_TO_CART",
+          payload: [],
+        });
+        dispatch({
+          type: "COUPON_APPLIED",
+          payload: false,
+        });
+        dispatch({
+          type: "COD",
+          payload: false,
+        });
+        emptyUserCart(user.token);
+        setTimeout(() => {
+          navigate("/user/history");
+        }, 1000);
+      }
+    });
+  };
+
   return (
     <div className="container">
       <div className="row">
@@ -190,13 +216,23 @@ const Checkout = () => {
 
           <div className="row">
             <div className="col-md-6 mb-2">
-              <button
-                className="btn btn-success"
-                disabled={!addressSaved || !products.length}
-                onClick={() => navigate("/payment")}
-              >
-                Place Order
-              </button>
+              {COD ? (
+                <button
+                  className="btn btn-success"
+                  disabled={!addressSaved || !products.length}
+                  onClick={createCashOrder}
+                >
+                  Place Order
+                </button>
+              ) : (
+                <button
+                  className="btn btn-success"
+                  disabled={!addressSaved || !products.length}
+                  onClick={() => navigate("/payment")}
+                >
+                  Place Order
+                </button>
+              )}
             </div>
 
             <div className="col-md-6">

@@ -3,6 +3,7 @@ const Product = require("../models/product");
 const Cart = require("../models/cart");
 const Coupon = require("../models/coupon");
 const Order = require("../models/order");
+const uniqueid = require("uniqueid");
 
 exports.userCart = async (req, res) => {
   const { cart } = req.body;
@@ -251,4 +252,64 @@ exports.removeFromWishlist = async (req, res) => {
   ).exec();
 
   res.json({ ok: true });
+};
+
+exports.createCashOrder = async (req, res) => {
+  const { COD, couponApplied } = req.body;
+
+  try {
+    if (!COD) {
+      return res.status(400).send("Create cash order failed");
+    }
+
+    const user = await User.findOne({ email: req.user.email }).exec();
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    let userCart = await Cart.findOne({ orderedBy: user._id }).exec();
+    if (!userCart) {
+      return res.status(404).json({ error: "Cart not found" });
+    }
+
+    let finalAmount = 0;
+
+    // Example logic for applying coupon (assuming couponApplied is defined)
+    if (couponApplied && userCart.totalAfterDiscount) {
+      finalAmount = userCart.totalAfterDiscount * 100;
+    } else {
+      finalAmount = userCart.cartTotal * 100;
+    }
+
+    let newOrder = await new Order({
+      products: userCart.products,
+      paymentIntent: {
+        id: uniqueid(),
+        amount: finalAmount,
+        currency: "aud",
+        status: "Cash On Delivery",
+        created: Date.now(),
+        payment_method_types: ["cash"],
+      },
+      orderedBy: user._id,
+      orderStatus: "Cash On Delivery", // Assuming you want to set status here
+    }).save();
+
+    // Update product quantities and sales
+    let bulkOption = userCart.products.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product._id },
+        update: { $inc: { quantity: -item.count, sold: +item.count } },
+      },
+    }));
+
+    let updated = await Product.bulkWrite(bulkOption, {});
+    console.log("PRODUCT QUANTITY-- AND SOLD++", updated);
+
+    console.log("NEW ORDER SAVED", newOrder);
+    res.json({ ok: true });
+  } catch (error) {
+    console.error("Error creating cash order:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
