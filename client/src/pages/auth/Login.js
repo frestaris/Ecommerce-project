@@ -9,8 +9,8 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import { createOrUpdateUser } from "../../functions/auth";
 
 const Login = () => {
-  const [email, setEmail] = useState("frestaris@gmail.com");
-  const [password, setPassword] = useState("123456");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
